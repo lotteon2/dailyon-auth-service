@@ -1,0 +1,17 @@
+server:
+  port: 8080
+spring:
+  config:
+    activate:
+      on-profile: local,dev,prod
+  application:
+    name: member-service
+  # config service settings
+  cloud:
+    config:
+      name: member-service
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health, info, refresh, busrefresh
