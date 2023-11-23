@@ -26,8 +26,7 @@ public class AuthService extends DefaultOAuth2UserService {
     }
 
     public MemberGetRequest getMember(Long id) {
-        Long memberId = 1L;
-        return memberApiClient.getMember(memberId);
+        return memberApiClient.getMember(id);
     }
 
     @Override
