@@ -47,6 +47,21 @@ public class AuthService extends DefaultOAuth2UserService {
 
     @Transactional
     public void saveAuth(String email, String role, String oauthProvider, @RequestBody MemberCreateRequest request) {
+        if (memberApiClient.duplicateCheck(email)) {
+
+        } else {
+            memberApiClient.registerMember(request);
+
+            Auth auth = Auth.builder()
+                    .email(email)
+                    .password(null)
+                    .role(role)
+                    .oauthProvider(oauthProvider)
+                    .build();
+
+            authRepository.save(auth);
+        }
+  /*      memberApiClient.duplicateCheck(email);
 
         memberApiClient.registerMember(request);
 
@@ -57,7 +72,7 @@ public class AuthService extends DefaultOAuth2UserService {
                 .oauthProvider(oauthProvider)
                 .build();
 
-        authRepository.save(auth);
+        authRepository.save(auth);*/
     }
 
     @Override
