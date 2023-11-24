@@ -70,6 +70,7 @@ public class AuthService extends DefaultOAuth2UserService {
                     .build();
 
             authRepository.save(auth);
+
             jwtToken = authenticateAndGenerateToken(email);
         }
 
