@@ -11,6 +11,7 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
 
 
+
 @Configuration
 @EnableMethodSecurity
 public class OAuth2SuccessHandler {
