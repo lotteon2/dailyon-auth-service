@@ -2,9 +2,13 @@ package com.dailyon.authservice.auth.service;
 
 import com.dailyon.authservice.auth.entity.Auth;
 import com.dailyon.authservice.auth.feign.MemberApiClient;
+import com.dailyon.authservice.auth.feign.request.MemberCreateRequest;
 import com.dailyon.authservice.auth.feign.request.MemberGetRequest;
 import com.dailyon.authservice.auth.repository.AuthRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.annotations.common.reflection.XMember;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
@@ -14,6 +18,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
 
@@ -34,7 +41,15 @@ public class AuthService extends DefaultOAuth2UserService {
         return memberApiClient.getMember(id);
     }
 
-    public void saveAuth(String email, String role, String oauthProvider) {
+    public String registerMember(@RequestBody MemberCreateRequest request){
+        return request.getEmail();
+    }
+
+    @Transactional
+    public void saveAuth(String email, String role, String oauthProvider, @RequestBody MemberCreateRequest request) {
+
+
+
         Auth auth = Auth.builder()
                 .email(email)
                 .password(null)
@@ -49,21 +64,26 @@ public class AuthService extends DefaultOAuth2UserService {
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
-        // Role generate
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_USER");
 
-        // nameAttributeKey
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName();
 
-        // 추출한 정보를 이용하여 saveAuth 호출
-        System.out.println(oAuth2User);
-        Map<String, Object> kakaoAccount = (Map<String, Object>) oAuth2User.getAttribute("kakao_account");
+        Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
         String email = (String) kakaoAccount.get("email");
-        System.out.println(email);
-        saveAuth(email, "ROLE_USER", "KAKAO");
+
+        Map<String, Object> kakaoInfo = oAuth2User.getAttribute("properties");
+        String nickname = (String) kakaoInfo.get("nickname");
+        String profileImgUrl = (String) kakaoInfo.get("profile_image");
+
+        MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname);
+
+
+        saveAuth(email, "ROLE_USER", "KAKAO",memberCreateRequest);
+
+
 
         return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
     }
