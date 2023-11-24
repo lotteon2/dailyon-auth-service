@@ -61,18 +61,6 @@ public class AuthService extends DefaultOAuth2UserService {
 
             authRepository.save(auth);
         }
-  /*      memberApiClient.duplicateCheck(email);
-
-        memberApiClient.registerMember(request);
-
-        Auth auth = Auth.builder()
-                .email(email)
-                .password(null)
-                .role(role)
-                .oauthProvider(oauthProvider)
-                .build();
-
-        authRepository.save(auth);*/
     }
 
     @Override
