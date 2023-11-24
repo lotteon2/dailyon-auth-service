@@ -48,7 +48,7 @@ public class AuthService extends DefaultOAuth2UserService {
     @Transactional
     public void saveAuth(String email, String role, String oauthProvider, @RequestBody MemberCreateRequest request) {
 
-
+        memberApiClient.registerMember(request);
 
         Auth auth = Auth.builder()
                 .email(email)
