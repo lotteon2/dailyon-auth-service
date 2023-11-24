@@ -5,13 +5,16 @@ import com.dailyon.authservice.auth.feign.MemberApiClient;
 import com.dailyon.authservice.auth.feign.request.MemberCreateRequest;
 import com.dailyon.authservice.auth.feign.request.MemberGetRequest;
 import com.dailyon.authservice.auth.repository.AuthRepository;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.dailyon.authservice.jwt.JwtService;
 import lombok.extern.slf4j.Slf4j;
-import org.hibernate.annotations.common.reflection.XMember;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
@@ -31,24 +34,31 @@ public class AuthService extends DefaultOAuth2UserService {
     private final MemberApiClient memberApiClient;
     private final AuthRepository authRepository;
 
+    private final CustomUserDetailsService userDetailsService;
+    private final JwtService jwtService;
+
     @Autowired
-    public AuthService(MemberApiClient memberApiClient, AuthRepository authRepository) {
+    public AuthService(MemberApiClient memberApiClient, AuthRepository authRepository, CustomUserDetailsService userDetailsService, JwtService jwtService) {
         this.memberApiClient = memberApiClient;
         this.authRepository = authRepository;
+        this.userDetailsService = userDetailsService;
+        this.jwtService = jwtService;
     }
 
     public MemberGetRequest getMember(Long id) {
         return memberApiClient.getMember(id);
     }
 
-    public String registerMember(@RequestBody MemberCreateRequest request){
-        return request.getEmail();
-    }
-
     @Transactional
-    public void saveAuth(String email, String role, String oauthProvider, @RequestBody MemberCreateRequest request) {
+    public String authenticateAndGenerateToken(String email) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        return jwtService.generateToken(userDetails);
+    }
+    @Transactional
+    public String saveAuth(String email, String role, String oauthProvider, @RequestBody MemberCreateRequest request) {
+        String jwtToken = null;
         if (memberApiClient.duplicateCheck(email)) {
-
+            jwtToken = authenticateAndGenerateToken(email);
         } else {
             memberApiClient.registerMember(request);
 
@@ -60,7 +70,11 @@ public class AuthService extends DefaultOAuth2UserService {
                     .build();
 
             authRepository.save(auth);
+            jwtToken = authenticateAndGenerateToken(email);
         }
+
+        log.info("User login successful. JWT Token: " + jwtToken);
+        return jwtToken;
     }
 
     @Override

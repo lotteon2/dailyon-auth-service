@@ -16,6 +16,6 @@ public interface MemberApiClient {
     boolean duplicateCheck(@PathVariable String email);
 
    @PostMapping("/members/register")
-    MemberGetRequest registerMember(@RequestBody MemberCreateRequest request);
+    void registerMember(@RequestBody MemberCreateRequest request);
 
 }
