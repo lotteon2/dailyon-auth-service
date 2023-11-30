@@ -15,6 +15,7 @@ import java.util.Map;
 
 @Service
 public class JwtService {
+    //TODO: Secret Key 테스트 완료 후 암호화 예정
     private String SECRET_KEY = "thisIsMySecretKeyWhichIsAtLeast32Characters";
 
     public String extractUsername(String token) {
@@ -43,11 +44,11 @@ public class JwtService {
         return createToken(claims, userDetails.getUsername());
     }
 
-
+    //TODO: 토큰 정상 작동 확인 후 Refresh 설정 및 지속 시간 수정
     private String createToken(Map<String, Object> claims, String subject) {
         SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
         return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))  // 10시간 동안 유효
+                .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
                 .signWith(key).compact();
     }
 

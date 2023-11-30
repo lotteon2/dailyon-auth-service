@@ -12,9 +12,6 @@ public interface MemberApiClient {
     @GetMapping("/members/{id}")
     MemberGetRequest getMember(@PathVariable Long id);
 
-    @GetMapping("/members/check/{email}")
-    boolean duplicateCheck(@PathVariable String email);
-
    @PostMapping("/members/register")
     void registerMember(@RequestBody MemberCreateRequest request);
 

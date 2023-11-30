@@ -49,15 +49,19 @@ public class AuthService extends DefaultOAuth2UserService {
         return memberApiClient.getMember(id);
     }
 
+
     @Transactional
     public String authenticateAndGenerateToken(String email) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return jwtService.generateToken(userDetails);
     }
+
     @Transactional
     public String saveAuth(String email, String role, String oauthProvider, @RequestBody MemberCreateRequest request) {
         String jwtToken = null;
-        if (memberApiClient.duplicateCheck(email)) {
+        Auth member = authRepository.findByEmail(email);
+
+        if (member != null) {
             jwtToken = authenticateAndGenerateToken(email);
         } else {
             memberApiClient.registerMember(request);
@@ -73,7 +77,7 @@ public class AuthService extends DefaultOAuth2UserService {
 
             jwtToken = authenticateAndGenerateToken(email);
         }
-
+        //TODO: 테스트 완료후 지울 예정
         log.info("User login successful. JWT Token: " + jwtToken);
         return jwtToken;
     }
