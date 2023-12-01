@@ -103,8 +103,6 @@ public class AuthService extends DefaultOAuth2UserService {
         String nickname = (String) kakaoInfo.get("nickname");
         String profileImgUrl = (String) kakaoInfo.get("profile_image");
 
-        //테스트 후 UUID 중복 가능성 있으면 중복체크 로직 작성해야함
-        String uuid = UUID.randomUUID().toString();
 
         MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname);
 
