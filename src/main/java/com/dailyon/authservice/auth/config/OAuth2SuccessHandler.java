@@ -57,7 +57,6 @@ public class OAuth2SuccessHandler {
             cookie.setMaxAge(7 * 24 * 60 * 60);
 
             response.addCookie(cookie);
-
             response.sendRedirect("/login-success");
         };
     }
