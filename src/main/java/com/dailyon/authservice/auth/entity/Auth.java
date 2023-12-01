@@ -17,7 +17,7 @@ public class Auth {
     @Id
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique=true)
     private String email;
 
     private String password;
