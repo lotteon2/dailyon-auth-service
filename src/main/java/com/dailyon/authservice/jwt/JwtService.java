@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,6 +51,9 @@ public class JwtService {
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         Auth auth = authRepository.findByEmail(userDetails.getUsername());
+        claims.put("userId", auth.getId());
+        claims.put("userRole", auth.getRole());
+
         return createToken(claims, userDetails.getUsername());
     }
 
@@ -66,4 +70,15 @@ public class JwtService {
         final String username = extractUsername(token);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
+
+    public String getTokenFromRequest(HttpServletRequest request) {
+        final String authorizationHeader = request.getHeader("Authorization");
+
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7); //
+        }
+
+        return authorizationHeader;
+    }
+
 }

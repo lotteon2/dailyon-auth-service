@@ -1,5 +1,6 @@
 package com.dailyon.authservice.auth.config;
 
+import com.dailyon.authservice.jwt.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -9,9 +10,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
-import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import static org.springframework.security.config.Customizer.withDefaults;
 
+import javax.servlet.http.Cookie;
 
 
 @Configuration
@@ -19,8 +19,11 @@ import static org.springframework.security.config.Customizer.withDefaults;
 public class OAuth2SuccessHandler {
     private final OAuth2UserService oAuth2UserService;
 
-    public OAuth2SuccessHandler(OAuth2UserService oAuth2UserService) {
+    private final JwtService jwtService;
+
+    public OAuth2SuccessHandler(OAuth2UserService oAuth2UserService, JwtService jwtService) {
         this.oAuth2UserService = oAuth2UserService;
+        this.jwtService = jwtService;
     }
 
     @Bean
@@ -47,6 +50,14 @@ public class OAuth2SuccessHandler {
     @Bean
     public AuthenticationSuccessHandler successHandler() {
         return (request, response, authentication) -> {
+            String token = jwtService.getTokenFromRequest(request);
+
+            Cookie cookie = new Cookie("Authorization", "Bearer " + token);
+            cookie.setHttpOnly(true);
+            cookie.setMaxAge(7 * 24 * 60 * 60);
+
+            response.addCookie(cookie);
+
             response.sendRedirect("/login-success");
         };
     }
