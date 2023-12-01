@@ -4,6 +4,7 @@ import com.dailyon.authservice.auth.config.MemberFeignConfig;
 import com.dailyon.authservice.auth.feign.request.MemberCreateRequest;
 import com.dailyon.authservice.auth.feign.request.MemberGetRequest;
 import org.springframework.cloud.openfeign.FeignClient;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -13,6 +14,6 @@ public interface MemberApiClient {
     MemberGetRequest getMember(@PathVariable Long id);
 
    @PostMapping("/members/register")
-    void registerMember(@RequestBody MemberCreateRequest request);
+   ResponseEntity<Long> registerMember(@RequestBody MemberCreateRequest request);
 
 }

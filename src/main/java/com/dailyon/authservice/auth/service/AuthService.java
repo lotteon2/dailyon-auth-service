@@ -8,6 +8,7 @@ import com.dailyon.authservice.auth.repository.AuthRepository;
 import com.dailyon.authservice.jwt.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -65,10 +66,11 @@ public class AuthService extends DefaultOAuth2UserService {
         if (member != null) {
             jwtToken = authenticateAndGenerateToken(email);
         } else {
+            ResponseEntity<Long> response= memberApiClient.registerMember(request);
 
-            memberApiClient.registerMember(request);
 
             Auth auth = Auth.builder()
+                    .id(response.getBody())
                     .email(email)
                     .password(null)
                     .role(role)
