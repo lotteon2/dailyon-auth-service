@@ -9,6 +9,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationFailureHandler;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import static org.springframework.security.config.Customizer.withDefaults;
 
 
 
@@ -25,12 +27,19 @@ public class OAuth2SuccessHandler {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.authorizeHttpRequests(config -> config.anyRequest().permitAll());
-        http.oauth2Login(oauth2Configurer -> oauth2Configurer
-                .loginPage("/login")
-                .successHandler(successHandler())
-                .failureHandler(failureHandler())
-                .userInfoEndpoint()
-                .userService(oAuth2UserService));
+        http
+                .oauth2Login(oauth2Configurer -> oauth2Configurer
+                        .loginPage("/login")
+                        .successHandler(successHandler())
+                        .failureHandler(failureHandler())
+                        .userInfoEndpoint()
+                        .userService(oAuth2UserService));
+
+        http.formLogin(formLoginConfigurer -> formLoginConfigurer
+                .loginPage("/admin/login")
+                .loginProcessingUrl("/admin/login")
+                .defaultSuccessUrl("/admin/dashboard", true)
+                .permitAll());
 
         return http.build();
     }

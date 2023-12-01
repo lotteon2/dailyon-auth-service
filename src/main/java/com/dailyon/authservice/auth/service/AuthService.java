@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -57,20 +58,20 @@ public class AuthService extends DefaultOAuth2UserService {
     }
 
     @Transactional
-    public String saveAuth(String email, String role, String oauthProvider, @RequestBody MemberCreateRequest request) {
+    public String saveAuth(String email, String role, @RequestBody MemberCreateRequest request) {
         String jwtToken = null;
         Auth member = authRepository.findByEmail(email);
 
         if (member != null) {
             jwtToken = authenticateAndGenerateToken(email);
         } else {
+
             memberApiClient.registerMember(request);
 
             Auth auth = Auth.builder()
                     .email(email)
                     .password(null)
                     .role(role)
-                    .oauthProvider(oauthProvider)
                     .build();
 
             authRepository.save(auth);
@@ -100,10 +101,12 @@ public class AuthService extends DefaultOAuth2UserService {
         String nickname = (String) kakaoInfo.get("nickname");
         String profileImgUrl = (String) kakaoInfo.get("profile_image");
 
+        //테스트 후 UUID 중복 가능성 있으면 중복체크 로직 작성해야함
+        String uuid = UUID.randomUUID().toString();
+
         MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname);
 
-
-        saveAuth(email, "ROLE_USER", "KAKAO",memberCreateRequest);
+        saveAuth(email, "ROLE_USER", memberCreateRequest);
 
 
 

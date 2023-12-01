@@ -1,10 +1,13 @@
 package com.dailyon.authservice.jwt;
 
+import com.dailyon.authservice.auth.entity.Auth;
+import com.dailyon.authservice.auth.repository.AuthRepository;
 import com.google.common.base.Function;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -15,6 +18,11 @@ import java.util.Map;
 
 @Service
 public class JwtService {
+
+
+    @Autowired
+    private AuthRepository authRepository;
+
     //TODO: Secret Key 테스트 완료 후 암호화 예정
     private String SECRET_KEY = "thisIsMySecretKeyWhichIsAtLeast32Characters";
 
@@ -41,6 +49,7 @@ public class JwtService {
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
+        Auth auth = authRepository.findByEmail(userDetails.getUsername());
         return createToken(claims, userDetails.getUsername());
     }
 

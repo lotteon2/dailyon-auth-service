@@ -26,22 +26,18 @@ public class Auth {
     @Column(nullable = false)
     private String role;
 
-    @Column(nullable = false)
-    private String oauthProvider;
 
     @Builder
     public Auth(
         Long id,
         String email,
         String password,
-        String role,
-        String oauthProvider
+        String role
     ){
         this.id = id;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.oauthProvider = oauthProvider;
     }
 
 }
