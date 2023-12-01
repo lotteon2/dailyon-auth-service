@@ -15,10 +15,9 @@ import javax.persistence.*;
 public class Auth {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique=true)
     private String email;
 
     private String password;
@@ -26,22 +25,18 @@ public class Auth {
     @Column(nullable = false)
     private String role;
 
-    @Column(nullable = false)
-    private String oauthProvider;
 
     @Builder
     public Auth(
         Long id,
         String email,
         String password,
-        String role,
-        String oauthProvider
+        String role
     ){
         this.id = id;
         this.email = email;
         this.password = password;
         this.role = role;
-        this.oauthProvider = oauthProvider;
     }
 
 }

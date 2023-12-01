@@ -8,6 +8,7 @@ import com.dailyon.authservice.auth.repository.AuthRepository;
 import com.dailyon.authservice.jwt.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -26,6 +27,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -49,31 +51,36 @@ public class AuthService extends DefaultOAuth2UserService {
         return memberApiClient.getMember(id);
     }
 
+
     @Transactional
     public String authenticateAndGenerateToken(String email) {
         UserDetails userDetails = userDetailsService.loadUserByUsername(email);
         return jwtService.generateToken(userDetails);
     }
+
     @Transactional
-    public String saveAuth(String email, String role, String oauthProvider, @RequestBody MemberCreateRequest request) {
+    public String saveAuth(String email, String role, @RequestBody MemberCreateRequest request) {
         String jwtToken = null;
-        if (memberApiClient.duplicateCheck(email)) {
+        Auth member = authRepository.findByEmail(email);
+
+        if (member != null) {
             jwtToken = authenticateAndGenerateToken(email);
         } else {
-            memberApiClient.registerMember(request);
+            ResponseEntity<Long> response= memberApiClient.registerMember(request);
+
 
             Auth auth = Auth.builder()
+                    .id(response.getBody())
                     .email(email)
                     .password(null)
                     .role(role)
-                    .oauthProvider(oauthProvider)
                     .build();
 
             authRepository.save(auth);
 
             jwtToken = authenticateAndGenerateToken(email);
         }
-
+        //TODO: 테스트 완료후 지울 예정
         log.info("User login successful. JWT Token: " + jwtToken);
         return jwtToken;
     }
@@ -96,10 +103,10 @@ public class AuthService extends DefaultOAuth2UserService {
         String nickname = (String) kakaoInfo.get("nickname");
         String profileImgUrl = (String) kakaoInfo.get("profile_image");
 
+
         MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname);
 
-
-        saveAuth(email, "ROLE_USER", "KAKAO",memberCreateRequest);
+        saveAuth(email, "ROLE_USER", memberCreateRequest);
 
 
 

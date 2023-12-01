@@ -20,6 +20,7 @@ public class MemberCreateRequest {
 
     private String nickname;
 
+
     //private String gender;
 
     //private String birth;
