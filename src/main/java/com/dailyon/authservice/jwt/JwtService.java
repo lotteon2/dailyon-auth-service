@@ -10,9 +10,13 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.SecretKey;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -48,14 +52,29 @@ public class JwtService {
         return extractExpiration(token).before(new Date());
     }
 
-    public String generateToken(UserDetails userDetails) {
-        Map<String, Object> claims = new HashMap<>();
-        Auth auth = authRepository.findByEmail(userDetails.getUsername());
-        claims.put("userId", auth.getId());
-        claims.put("userRole", auth.getRole());
+    public String generateToken(String username, Map<String, Object> claims, HttpServletResponse response) {
+        String jwtToken = createToken(claims, username);
+        setTokenCookie(jwtToken, response);
 
-        return createToken(claims, userDetails.getUsername());
+        return jwtToken;
     }
+
+
+    private void setTokenCookie(String token, HttpServletResponse response) {
+        if (response == null) {
+            System.out.println("Response is null. Cannot set cookie.");
+            return;
+        }
+
+        Cookie cookie = new Cookie("userInfo", token);
+        cookie.setPath("/");
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false); // 서비스시 true로?
+        cookie.setMaxAge(3600); // 1시간 동안 유지
+        response.addCookie(cookie);
+
+    }
+
 
     //TODO: 토큰 정상 작동 확인 후 Refresh 설정 및 지속 시간 수정
     private String createToken(Map<String, Object> claims, String subject) {
@@ -80,5 +99,8 @@ public class JwtService {
 
         return authorizationHeader;
     }
+
+
+
 
 }
