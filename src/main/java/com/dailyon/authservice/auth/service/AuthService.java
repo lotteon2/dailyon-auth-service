@@ -23,8 +23,12 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -52,38 +56,53 @@ public class AuthService extends DefaultOAuth2UserService {
     }
 
 
-    @Transactional
+/*    @Transactional
     public String authenticateAndGenerateToken(String email) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-        return jwtService.generateToken(userDetails);
+        return jwtService.generateToken(email);
+    }*/
+    @Transactional
+    public String generateToken(String username, HttpServletResponse response) {
+        Map<String, Object> claims = new HashMap<>();
+        Auth auth = authRepository.findByEmail(username);
+        System.out.println("#################");
+        System.out.println(auth);
+        System.out.println("#################");
+        claims.put("userId", auth.getId());
+        claims.put("userRole", auth.getRole());
+
+        return jwtService.generateToken(username, claims, response);
     }
 
+
     @Transactional
-    public String saveAuth(String email, String role, @RequestBody MemberCreateRequest request) {
+    public String authenticateAndGenerateToken(String email, HttpServletResponse response) {
+        return generateToken(email, response);
+    }
+
+
+    @Transactional
+    public String saveAuth(String email, String role, @RequestBody MemberCreateRequest request, HttpServletResponse response) {
         String jwtToken = null;
         Auth member = authRepository.findByEmail(email);
 
         if (member != null) {
-            jwtToken = authenticateAndGenerateToken(email);
+            jwtToken = authenticateAndGenerateToken(email, response);
         } else {
-            ResponseEntity<Long> response= memberApiClient.registerMember(request);
-
-
+            ResponseEntity<Long> res = memberApiClient.registerMember(request);
             Auth auth = Auth.builder()
-                    .id(response.getBody())
+                    .id(res.getBody())
                     .email(email)
                     .password(null)
                     .role(role)
                     .build();
 
             authRepository.save(auth);
-
-            jwtToken = authenticateAndGenerateToken(email);
+            jwtToken = authenticateAndGenerateToken(email, response);
         }
-        //TODO: 테스트 완료후 지울 예정
         log.info("User login successful. JWT Token: " + jwtToken);
         return jwtToken;
     }
+
 
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
@@ -106,10 +125,12 @@ public class AuthService extends DefaultOAuth2UserService {
 
         MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname);
 
-        saveAuth(email, "ROLE_USER", memberCreateRequest);
-
-
+        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+        if (response != null) {
+            saveAuth(email, "ROLE_USER", memberCreateRequest, response);
+        }
 
         return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
     }
+
 }
