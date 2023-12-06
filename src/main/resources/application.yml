@@ -1,15 +1,15 @@
 server:
-  port: 8080
+  port: 8081
 spring:
   config:
     activate:
       on-profile: local,dev,prod
   application:
-    name: member-service
+    name: auth-service
   # config service settings
   cloud:
     config:
-      name: member-service
+      name: auth-service
 management:
   endpoints:
     web:

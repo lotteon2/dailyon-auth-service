@@ -51,9 +51,7 @@ public class AuthService extends DefaultOAuth2UserService {
         this.jwtService = jwtService;
     }
 
-    public MemberGetRequest getMember(Long id) {
-        return memberApiClient.getMember(id);
-    }
+
 
 
 /*    @Transactional

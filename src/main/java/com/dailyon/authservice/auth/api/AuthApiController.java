@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
-@Controller
+@RestController
 @Slf4j
 @RequestMapping("/auth")
 @CrossOrigin("*")
@@ -18,24 +18,10 @@ public class AuthApiController {
     @Autowired
     private AuthService authService;
 
-
-    @GetMapping("/index")
-    public String index() {
-        return "login";
+    @GetMapping("")
+    public void test() {
+        log.info("aaaa : {} => ");
     }
-
-
-    @GetMapping("/search/{id}")
-    public ResponseEntity<MemberGetRequest> getMember(@PathVariable Long id) {
-        MemberGetRequest memberData = authService.getMember(id);
-
-        if (memberData == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(memberData);
-    }
-
 
 }
 

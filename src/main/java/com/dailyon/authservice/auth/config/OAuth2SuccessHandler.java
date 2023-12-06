@@ -2,8 +2,10 @@ package com.dailyon.authservice.auth.config;
 
 import com.dailyon.authservice.auth.service.AuthService;
 import com.dailyon.authservice.jwt.JwtService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
@@ -22,6 +24,8 @@ public class OAuth2SuccessHandler {
     private final OAuth2UserService oAuth2UserService;
     private final AuthService authService;
 
+    @Autowired
+    private Environment environment;
     private final JwtService jwtService;
 
     public OAuth2SuccessHandler(OAuth2UserService oAuth2UserService, AuthService authService, JwtService jwtService) {
@@ -38,7 +42,6 @@ public class OAuth2SuccessHandler {
                 .oauth2Login(oauth2Configurer -> oauth2Configurer
                         .loginPage("/login")
                         .successHandler(successHandler())
-                        .failureHandler(failureHandler())
                         .userInfoEndpoint()
                         .userService(oAuth2UserService));
 
@@ -60,15 +63,10 @@ public class OAuth2SuccessHandler {
             String email = (String) kakaoAccount.get("email");
             authService.generateToken(email, response);
 
-            response.sendRedirect("http://localhost:5173/");
+            response.sendRedirect(environment.getProperty("redirectUrl"));
         };
     }
 
 
-
-    @Bean
-    public AuthenticationFailureHandler failureHandler() {
-        return new SimpleUrlAuthenticationFailureHandler("/login-failure");
-    }
 
 }
