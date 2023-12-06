@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
-@Controller
+@RestController
 @Slf4j
 @RequestMapping("/auth")
 @CrossOrigin("*")
@@ -18,7 +18,10 @@ public class AuthApiController {
     @Autowired
     private AuthService authService;
 
-
+    @GetMapping("")
+    public void test() {
+        log.info("aaaa : {} => ");
+    }
 
 }
 
