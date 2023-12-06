@@ -38,7 +38,6 @@ public class OAuth2SuccessHandler {
                 .oauth2Login(oauth2Configurer -> oauth2Configurer
                         .loginPage("/login")
                         .successHandler(successHandler())
-                        .failureHandler(failureHandler())
                         .userInfoEndpoint()
                         .userService(oAuth2UserService));
 
@@ -60,15 +59,10 @@ public class OAuth2SuccessHandler {
             String email = (String) kakaoAccount.get("email");
             authService.generateToken(email, response);
 
-            response.sendRedirect("http://localhost:5173/");
+            response.sendRedirect("http://localhost:5173/logininfo");
         };
     }
 
 
-
-    @Bean
-    public AuthenticationFailureHandler failureHandler() {
-        return new SimpleUrlAuthenticationFailureHandler("/login-failure");
-    }
 
 }

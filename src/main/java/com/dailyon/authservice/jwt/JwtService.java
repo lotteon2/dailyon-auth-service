@@ -7,7 +7,12 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -24,12 +29,12 @@ import java.util.Map;
 @Service
 public class JwtService {
 
-
     @Autowired
     private AuthRepository authRepository;
 
-    //TODO: Secret Key 테스트 완료 후 암호화 예정
-    private String SECRET_KEY = "thisIsMySecretKeyWhichIsAtLeast32Characters";
+    @Autowired
+    private Environment environment;
+
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -45,7 +50,7 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser().setSigningKey(SECRET_KEY).parseClaimsJws(token).getBody();
+        return Jwts.parser().setSigningKey(environment.getProperty("secretKey")).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token) {
@@ -66,23 +71,30 @@ public class JwtService {
             return;
         }
 
-        Cookie cookie = new Cookie("userInfo", token);
-        cookie.setPath("/");
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false); // 서비스시 true로?
-        cookie.setMaxAge(3600); // 1시간 동안 유지
-        response.addCookie(cookie);
+        ResponseCookie responseCookie = ResponseCookie.from("userInfo", token)
+                .domain("localhost")
+                .httpOnly(true)
+                .path("/")
+                .sameSite("Lax")
+                .maxAge(3600)
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
 
     }
 
 
     //TODO: 토큰 정상 작동 확인 후 Refresh 설정 및 지속 시간 수정
     private String createToken(Map<String, Object> claims, String subject) {
-        SecretKey key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
-        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(subject)
+                .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .signWith(key).compact();
+                .signWith(Keys.hmacShaKeyFor(environment.getProperty("secretKey").getBytes()))
+                .compact();
     }
+
 
 
     public Boolean validateToken(String token, UserDetails userDetails) {

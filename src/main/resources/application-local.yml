@@ -3,33 +3,12 @@ spring:
     activate:
       on-profile: local
     import: optional:configserver:http://127.0.0.1:8888
-  # rabbitmq settings
-#  rabbitmq:
-#    host: 127.0.0.1
-#    port: 5672
-#    username: guest
-#    password: guest
-  cloud:
-    discovery:
-      enabled: false
-  security:
-    oauth2:
-      client:
-        registration:
-          kakao:
-            client-id: 77ecb33640211a3fffc5554eb2344bbc
-            client-secret: UGtcEk5Ik1jQ2OUKs5AGvASAkHHsDppY
-            redirect-uri: http://localhost:8080/login/oauth2/code/kakao #"http://localhost:8080/app/login/kakao"
-            client-authentication-method: POST
-            authorization-grant-type: authorization_code
-            scope: profile_nickname, profile_image, account_email
-            client-name: Kakao
-        provider:
-          kakao:
-            authorization_uri: https://kauth.kakao.com/oauth/authorize
-            token_uri: https://kauth.kakao.com/oauth/token
-            user-info-uri: https://kapi.kakao.com/v2/user/me
-            user_name_attribute: id
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: guest
+    password: guest
+
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: jdbc:mysql://localhost:3306/auth-service

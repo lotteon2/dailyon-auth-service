@@ -19,23 +19,6 @@ public class AuthApiController {
     private AuthService authService;
 
 
-    @GetMapping("/index")
-    public String index() {
-        return "login";
-    }
-
-
-    @GetMapping("/search/{id}")
-    public ResponseEntity<MemberGetRequest> getMember(@PathVariable Long id) {
-        MemberGetRequest memberData = authService.getMember(id);
-
-        if (memberData == null) {
-            return ResponseEntity.notFound().build();
-        }
-
-        return ResponseEntity.ok(memberData);
-    }
-
 
 }
 

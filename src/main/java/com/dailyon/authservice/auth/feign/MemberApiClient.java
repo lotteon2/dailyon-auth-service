@@ -8,12 +8,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 
-@FeignClient(name ="member-service", url ="http://localhost:8081" , configuration = MemberFeignConfig.class)
+@FeignClient(name ="member-service", configuration = MemberFeignConfig.class)
 public interface MemberApiClient {
-    @GetMapping("/members/{id}")
-    MemberGetRequest getMember(@PathVariable Long id);
-
-   @PostMapping("/members/register")
+   @PostMapping("/clients/members/register")
    ResponseEntity<Long> registerMember(@RequestBody MemberCreateRequest request);
 
 }

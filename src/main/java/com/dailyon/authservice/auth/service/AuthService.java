@@ -51,9 +51,7 @@ public class AuthService extends DefaultOAuth2UserService {
         this.jwtService = jwtService;
     }
 
-    public MemberGetRequest getMember(Long id) {
-        return memberApiClient.getMember(id);
-    }
+
 
 
 /*    @Transactional
@@ -67,7 +65,7 @@ public class AuthService extends DefaultOAuth2UserService {
         System.out.println("#################");
         System.out.println(auth);
         System.out.println("#################");
-        claims.put("userId", auth.getId());
+        claims.put("@AUuserId", auth.getId());
         claims.put("userRole", auth.getRole());
 
         return jwtService.generateToken(username, claims, response);
