@@ -41,3 +41,7 @@ logging:
         jdbc:
           core:
             JdbcTemplate: DEBUG
+
+
+endpoint:
+  member-service: http://localhost:8080

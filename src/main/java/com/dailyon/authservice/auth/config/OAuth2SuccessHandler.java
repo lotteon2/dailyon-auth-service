@@ -2,6 +2,7 @@ package com.dailyon.authservice.auth.config;
 
 import com.dailyon.authservice.auth.service.AuthService;
 import com.dailyon.authservice.jwt.JwtService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.SimpleUrlAuthenticationFa
 import java.util.Map;
 
 
+@Slf4j
 @Configuration
 @EnableMethodSecurity
 public class OAuth2SuccessHandler {
@@ -40,7 +42,6 @@ public class OAuth2SuccessHandler {
         http.authorizeHttpRequests(config -> config.anyRequest().permitAll());
         http
                 .oauth2Login(oauth2Configurer -> oauth2Configurer
-                        .loginPage("/login")
                         .successHandler(successHandler())
                         .userInfoEndpoint()
                         .userService(oAuth2UserService));
@@ -57,6 +58,7 @@ public class OAuth2SuccessHandler {
     @Bean
     public AuthenticationSuccessHandler successHandler() {
         return (request, response, authentication) -> {
+            log.info("successful authentication");
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
             Map<String, Object> userAttributes = oAuth2User.getAttributes();
             Map<String, Object> kakaoAccount = (Map<String, Object>) userAttributes.get("kakao_account");
