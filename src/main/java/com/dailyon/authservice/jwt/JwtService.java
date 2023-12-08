@@ -68,10 +68,8 @@ public class JwtService {
 
     private void setTokenHeader(String token, HttpServletResponse response) {
         if (response == null) {
-            System.out.println("Response is null. Cannot set header.");
             return;
         }
-        System.out.println("헤더 설정 시작");
         ResponseCookie responseCookie = ResponseCookie.from("userInfo", token)
                 .domain("localhost")
                 .httpOnly(true)
@@ -81,8 +79,6 @@ public class JwtService {
                 .build();
 
         response.addHeader("Authorization", "Bearer " + token);
-        System.out.println("헤더 설정완료!");
-
     }
 
 
