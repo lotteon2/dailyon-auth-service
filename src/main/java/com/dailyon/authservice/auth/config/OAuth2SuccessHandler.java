@@ -63,9 +63,9 @@ public class OAuth2SuccessHandler {
             Map<String, Object> userAttributes = oAuth2User.getAttributes();
             Map<String, Object> kakaoAccount = (Map<String, Object>) userAttributes.get("kakao_account");
             String email = (String) kakaoAccount.get("email");
-            authService.generateToken(email, response);
+            String token = authService.generateToken(email, response);
 
-            response.sendRedirect(environment.getProperty("redirectUrl"));
+            response.sendRedirect(environment.getProperty("redirectUrl") + "?token=" + token);
         };
     }
 

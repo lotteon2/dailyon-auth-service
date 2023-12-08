@@ -19,6 +19,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.crypto.SecretKey;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -59,18 +60,16 @@ public class JwtService {
 
     public String generateToken(String username, Map<String, Object> claims, HttpServletResponse response) {
         String jwtToken = createToken(claims, username);
-        setTokenCookie(jwtToken, response);
+        setTokenHeader(jwtToken, response);
 
         return jwtToken;
     }
 
 
-    private void setTokenCookie(String token, HttpServletResponse response) {
+    private void setTokenHeader(String token, HttpServletResponse response) {
         if (response == null) {
-            System.out.println("Response is null. Cannot set cookie.");
             return;
         }
-
         ResponseCookie responseCookie = ResponseCookie.from("userInfo", token)
                 .domain("localhost")
                 .httpOnly(true)
@@ -79,8 +78,7 @@ public class JwtService {
                 .maxAge(3600)
                 .build();
 
-        response.addHeader(HttpHeaders.SET_COOKIE, responseCookie.toString());
-
+        response.addHeader("Authorization", "Bearer " + token);
     }
 
 
