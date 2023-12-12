@@ -43,6 +43,8 @@ public class AuthService extends DefaultOAuth2UserService {
     private final CustomUserDetailsService userDetailsService;
     private final JwtService jwtService;
 
+
+
     @Autowired
     public AuthService(MemberApiClient memberApiClient, AuthRepository authRepository, CustomUserDetailsService userDetailsService, JwtService jwtService) {
         this.memberApiClient = memberApiClient;
