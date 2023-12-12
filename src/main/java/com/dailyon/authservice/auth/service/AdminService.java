@@ -16,8 +16,4 @@ public class AdminService {
         this.authRepository = authRepository;
     }
 
-    public boolean adminLogin(@RequestBody AdminLoginRequest user) {
-        Auth adminUser = authRepository.findByEmail(user.getId());
-        return adminUser.getPassword().equals(user.getPw());
-    }
 }
