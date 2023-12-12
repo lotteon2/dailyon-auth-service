@@ -16,14 +16,6 @@ import org.springframework.web.bind.annotation.*;
 @CrossOrigin("*")
 public class AuthApiController {
 
-    @Autowired
-    private AuthService authService;
-
-    @GetMapping("")
-    public void test() {
-        log.info("aaaa : {} => ");
-    }
-
 }
 
 

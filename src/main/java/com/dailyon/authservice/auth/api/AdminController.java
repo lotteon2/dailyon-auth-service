@@ -32,10 +32,7 @@ import java.util.List;
 @Slf4j
 @CrossOrigin("*")
 public class AdminController {
-    @GetMapping("")
-    public void test() {
-        log.info("admintest : {} => ");
-    }
+
 
 }
 

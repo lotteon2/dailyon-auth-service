@@ -64,9 +64,6 @@ public class AuthService extends DefaultOAuth2UserService {
     public String generateToken(String username, HttpServletResponse response) {
         Map<String, Object> claims = new HashMap<>();
         Auth auth = authRepository.findByEmail(username);
-        System.out.println("#################");
-        System.out.println(auth);
-        System.out.println("#################");
         claims.put("memberId", auth.getId());
         claims.put("role", auth.getRole());
 
