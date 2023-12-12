@@ -65,7 +65,6 @@ public class OAuth2SuccessHandler {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(new CustomFilter(), UsernamePasswordAuthenticationFilter.class)
                 .cors(withDefaults())
                 .csrf().disable()
                 .authorizeHttpRequests(config -> config.anyRequest().permitAll())

@@ -37,8 +37,6 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
-      springframework:
-        security : DEBUG
         jdbc:
           core:
             JdbcTemplate: DEBUG
