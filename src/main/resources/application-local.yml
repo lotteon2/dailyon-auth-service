@@ -37,7 +37,6 @@ logging:
     org:
       hibernate:
         SQL: DEBUG
-      springframework:
         jdbc:
           core:
             JdbcTemplate: DEBUG
@@ -45,3 +44,4 @@ logging:
 
 endpoint:
   member-service: http://localhost:8080
+

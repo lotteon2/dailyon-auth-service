@@ -1,12 +1,19 @@
 package com.dailyon.authservice.auth.service;
 
+import com.dailyon.authservice.auth.api.request.AdminLoginRequest;
+import com.dailyon.authservice.auth.entity.Auth;
+import com.dailyon.authservice.auth.repository.AuthRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 
 @Service
 public class AdminService {
 
-    // 실제로는 데이터베이스에서 관리자 정보를 조회하여 확인해야 함
-    public boolean isValidAdmin(String adminId, String adminPassword) {
-        return "admin".equals(adminId) && "password".equals(adminPassword);
+    private final AuthRepository authRepository;
+
+    public AdminService(AuthRepository authRepository) {
+        this.authRepository = authRepository;
     }
+
 }
