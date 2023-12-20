@@ -111,20 +111,11 @@ public class AuthService extends DefaultOAuth2UserService {
         Map<String, Object> kakaoInfo = oAuth2User.getAttribute("properties");
 
 
-        log.info("##@#@!#@#@#@#!# => {}", kakaoAccount);
-        log.info("##@#@!#@#@#@#!# => {}", kakaoInfo);
-
-
-
-
         String email = (String) kakaoAccount.get("email");
         String nickname = (String) kakaoInfo.get("nickname");
-
         String birth = (String) kakaoAccount.get("birthyear");
         String gender = (String) kakaoAccount.get("gender");
-
         String profileImgUrl = (String) kakaoInfo.get("profile_image");
-
 
         MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, birth, gender);
 
