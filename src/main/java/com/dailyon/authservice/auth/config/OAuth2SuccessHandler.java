@@ -41,26 +41,12 @@ public class OAuth2SuccessHandler {
 
     @Autowired
     private Environment environment;
-    private final JwtService jwtService;
 
-    public OAuth2SuccessHandler(OAuth2UserService oAuth2UserService, AuthService authService, JwtService jwtService) {
+    public OAuth2SuccessHandler(OAuth2UserService oAuth2UserService, AuthService authService) {
         this.oAuth2UserService = oAuth2UserService;
         this.authService = authService;
-        this.jwtService = jwtService;
     }
 
-/*    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.csrf().disable();
-        http.authorizeHttpRequests(config -> config.anyRequest().permitAll());
-        http
-                .oauth2Login(oauth2Configurer -> oauth2Configurer
-                        .successHandler(successHandler())
-                        .userInfoEndpoint()
-                        .userService(oAuth2UserService));
-
-        return http.build();
-    }*/
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
