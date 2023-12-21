@@ -55,11 +55,6 @@ public class AuthService extends DefaultOAuth2UserService {
 
 
 
-
-/*    @Transactional
-    public String authenticateAndGenerateToken(String email) {
-        return jwtService.generateToken(email);
-    }*/
     @Transactional
     public String generateToken(String username, HttpServletResponse response) {
         Map<String, Object> claims = new HashMap<>();
@@ -113,14 +108,16 @@ public class AuthService extends DefaultOAuth2UserService {
                 .getUserNameAttributeName();
 
         Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
-        String email = (String) kakaoAccount.get("email");
-
         Map<String, Object> kakaoInfo = oAuth2User.getAttribute("properties");
+
+
+        String email = (String) kakaoAccount.get("email");
         String nickname = (String) kakaoInfo.get("nickname");
+        String birth = (String) kakaoAccount.get("birthyear");
+        String gender = (String) kakaoAccount.get("gender");
         String profileImgUrl = (String) kakaoInfo.get("profile_image");
 
-
-        MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname);
+        MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, birth, gender);
 
         HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
         if (response != null) {
