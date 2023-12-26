@@ -4,6 +4,7 @@ import com.dailyon.authservice.auth.service.AuthService;
 import com.dailyon.authservice.jwt.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -53,7 +54,10 @@ public class OAuth2SuccessHandler {
         http
                 .cors(withDefaults())
                 .csrf().disable()
-                .authorizeHttpRequests(config -> config.anyRequest().permitAll())
+                .authorizeHttpRequests(config -> config
+                        .antMatchers("/h2-console/**").permitAll()
+                        .anyRequest().permitAll())
+                .headers(headers -> headers.frameOptions().disable())
                 .oauth2Login(oauth2Configurer -> oauth2Configurer
                         .successHandler(successHandler())
                         .userInfoEndpoint()
@@ -62,7 +66,6 @@ public class OAuth2SuccessHandler {
                 .formLogin(formLoginConfigurer -> formLoginConfigurer
                         .loginProcessingUrl("/admin/login")
                         .successHandler(adminSuccessHandler()));
-
 
         return http.build();
     }
