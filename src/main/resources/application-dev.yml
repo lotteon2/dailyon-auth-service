@@ -10,30 +10,11 @@ spring:
     username: guest
     password: guest
   # DB settings
-  #datasource:
-    #driver-class-name: com.mysql.cj.jdbc.Driver
-    #url: jdbc:mysql://localhost:3306/auth-service
-    #username: root
-    #password: 11111111
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:auth-service;DB_CLOSE_DELAY=-1;DATABASE_TO_UPPER=false;MODE=MySQL
-  h2:
-    console:
-      enabled: true
-      settings:
-        web-allow-others: true
-      path: /h2-console
-  jpa:
-    hibernate:
-      ddl-auto: create
-      #ddl-auto: update
-    generate-ddl: true
-    # Bean이 생성되기 전에 ddl 실행
-    defer-datasource-initialization: true
-    properties:
-      hibernate:
-        format_sql: true
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/auth-service
+    username: root
+    password: 11111111
 eureka:
   client:
     register-with-eureka: true
