@@ -11,5 +11,5 @@ spec:
   accessModes:
     - ReadWriteOnce # 하나의 Pod에 마운트
   awsElasticBlockStore:
-    volumeID: vol-0d7b1bda0635390c8
+    volumeID: vol-08b5308e97719f789
   persistentVolumeReclaimPolicy: Retain
