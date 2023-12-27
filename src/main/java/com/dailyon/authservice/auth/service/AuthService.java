@@ -117,7 +117,7 @@ public class AuthService extends DefaultOAuth2UserService {
             String birth = "";
             String gender = "";
 
-            MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, birth, gender);
+            MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, gender, birth);
             HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
 
             if (response != null) {
@@ -130,11 +130,11 @@ public class AuthService extends DefaultOAuth2UserService {
 
             String email = (String) kakaoAccount.get("email");
             String nickname = (String) kakaoInfo.get("nickname");
-            String birth = (String) kakaoAccount.get("birthyear");
+            String birth = (String) kakaoAccount.get("age_range");
             String gender = (String) kakaoAccount.get("gender");
             String profileImgUrl = (String) kakaoInfo.get("profile_image");
 
-            MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, birth, gender);
+            MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, gender, birth);
 
             HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
             if (response != null) {
