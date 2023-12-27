@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: sns-deployment
+  name: auth-deployment
   namespace: prod
   labels:
     app: auth-service
