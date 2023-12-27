@@ -14,8 +14,10 @@ import org.springframework.security.config.annotation.web.configurers.AbstractAu
 import org.springframework.security.config.annotation.web.configurers.FormLoginConfigurer;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.memory.UserAttribute;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.userinfo.OAuth2UserService;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.SecurityFilterChain;
@@ -91,11 +93,20 @@ public class OAuth2SuccessHandler {
         return (request, response, authentication) -> {
             OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
             Map<String, Object> userAttributes = oAuth2User.getAttributes();
-            Map<String, Object> kakaoAccount = (Map<String, Object>) userAttributes.get("kakao_account");
-            String email = (String) kakaoAccount.get("email");
-            String token = authService.generateToken(email, response);
+            String provider = ((OAuth2AuthenticationToken) authentication).getAuthorizedClientRegistrationId();
 
-            response.sendRedirect(environment.getProperty("redirectUrl") + "?token=" + token);
+            if (provider.equals("kakao")) {
+                Map<String, Object> kakaoAccount = (Map<String, Object>) userAttributes.get("kakao_account");
+                String email = (String) kakaoAccount.get("email");
+                String token = authService.generateToken(email, response);
+
+                response.sendRedirect(environment.getProperty("redirectUrl") + "?token=" + token);
+            } else if(provider.equals("google")) {
+                String email = oAuth2User.getAttribute("email");
+                String token = authService.generateToken(email, response);
+
+                response.sendRedirect(environment.getProperty("redirectUrl") + "?token=" + token);
+            }
         };
     }
 

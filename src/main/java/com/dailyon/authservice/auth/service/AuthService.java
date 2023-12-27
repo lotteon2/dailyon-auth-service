@@ -99,30 +99,56 @@ public class AuthService extends DefaultOAuth2UserService {
     @Override
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         OAuth2User oAuth2User = super.loadUser(userRequest);
-
         List<GrantedAuthority> authorities = AuthorityUtils.createAuthorityList("ROLE_USER");
+        String provider = userRequest.getClientRegistration().getRegistrationId();
 
         String userNameAttributeName = userRequest.getClientRegistration()
                 .getProviderDetails()
                 .getUserInfoEndpoint()
                 .getUserNameAttributeName();
 
-        Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
-        Map<String, Object> kakaoInfo = oAuth2User.getAttribute("properties");
 
 
-        String email = (String) kakaoAccount.get("email");
-        String nickname = (String) kakaoInfo.get("nickname");
-        String birth = (String) kakaoAccount.get("birthyear");
-        String gender = (String) kakaoAccount.get("gender");
-        String profileImgUrl = (String) kakaoInfo.get("profile_image");
+        if ("google".equals(provider)) {
+            log.info("구글 로그인");
+            String nickname= oAuth2User.getAttribute("name");
+            String email = oAuth2User.getAttribute("email");
+            String profileImgUrl = oAuth2User.getAttribute("picture");
+            String birth = "";
+            String gender = "";
 
-        MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, birth, gender);
+            MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, birth, gender);
+            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
 
-        HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
-        if (response != null) {
-            saveAuth(email, "ROLE_USER", memberCreateRequest, response);
+            if (response != null) {
+                saveAuth(email, "ROLE_USER", memberCreateRequest, response);
+            }
+        } else if ("kakao".equals(provider)){
+            Map<String, Object> kakaoAccount = oAuth2User.getAttribute("kakao_account");
+            Map<String, Object> kakaoInfo = oAuth2User.getAttribute("properties");
+
+
+            String email = (String) kakaoAccount.get("email");
+            String nickname = (String) kakaoInfo.get("nickname");
+            String birth = (String) kakaoAccount.get("birthyear");
+            String gender = (String) kakaoAccount.get("gender");
+            String profileImgUrl = (String) kakaoInfo.get("profile_image");
+
+            MemberCreateRequest memberCreateRequest = new MemberCreateRequest(email, profileImgUrl, nickname, birth, gender);
+
+            HttpServletResponse response = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getResponse();
+            if (response != null) {
+                saveAuth(email, "ROLE_USER", memberCreateRequest, response);
+            }
         }
+
+        log.info("############");
+        log.info(String.valueOf(oAuth2User));
+        log.info(userNameAttributeName);
+        log.info("##############");
+
+
+
 
         return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
     }
