@@ -10,6 +10,8 @@ spring:
   cloud:
     config:
       name: auth-service
+  jackson:
+    time-zone: Asia/Seoul
 management:
   endpoints:
     web:
