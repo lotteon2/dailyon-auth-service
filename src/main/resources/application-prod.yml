@@ -15,6 +15,9 @@ spring:
     url: jdbc:mysql://auth-db-service:3306/auth-service
     username: root
     password: 11111111
+  zipkin:
+    base-url: http://zipkin-service:9411/
+    enabled: true
 eureka:
   client:
     register-with-eureka: true
