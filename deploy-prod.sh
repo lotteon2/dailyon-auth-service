@@ -6,26 +6,10 @@ export IMAGE_TAG=${IMAGE_TAG}
 
 deployment_name="auth-deployment"
 service_name="auth-service"
-pv_name="auth-ebs-pv"
-pvc_name="auth-ebs-pvc"
 namespace="prod"
 
 # Update AWS EKS user config
 aws eks update-kubeconfig --region ap-northeast-2 --name $AWS_EKS_CLUSTER_NAME
-
-if kubectl get pv "${pv_name}" -n "${namespace}" &> /dev/null; then
-  echo "PersistenceVolume is already exists"
-  kubectl apply -f ./pv-prod.yml
-else
-  kubectl create -f ./pv-prod.yml
-fi
-
-if kubectl get pvc "${pvc_name}" -n "${namespace}" &> /dev/null; then
-  echo "PersistenceVolumeClaim is already exists"
-  kubectl apply -f ./pvc-prod.yml
-else
-  kubectl create -f ./pvc-prod.yml
-fi
 
 # Deploy kubernetes deployment resource
 echo "Apply new kubernetes deployment resources..."
