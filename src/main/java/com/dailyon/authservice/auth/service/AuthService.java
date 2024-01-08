@@ -39,17 +39,14 @@ public class AuthService extends DefaultOAuth2UserService {
 
     private final MemberApiClient memberApiClient;
     private final AuthRepository authRepository;
-
-    private final CustomUserDetailsService userDetailsService;
     private final JwtService jwtService;
 
 
 
     @Autowired
-    public AuthService(MemberApiClient memberApiClient, AuthRepository authRepository, CustomUserDetailsService userDetailsService, JwtService jwtService) {
+    public AuthService(MemberApiClient memberApiClient, AuthRepository authRepository, JwtService jwtService) {
         this.memberApiClient = memberApiClient;
         this.authRepository = authRepository;
-        this.userDetailsService = userDetailsService;
         this.jwtService = jwtService;
     }
 
