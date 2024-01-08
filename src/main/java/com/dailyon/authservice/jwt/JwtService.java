@@ -13,10 +13,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import javax.servlet.http.HttpServletResponse;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -68,12 +65,14 @@ public class JwtService {
     private String createToken(Map<String, Object> claims, String subject) {
         String refreshToken = generateRefreshToken(subject, claims);
 
+        long accessExpInMillis = Long.parseLong(Objects.requireNonNull(environment.getProperty("accessExp")));
+
+
         String accessToken = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                //.setExpiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 10))
-                .setExpiration(new Date(System.currentTimeMillis() + 10000)) // 10초
+                .setExpiration(new Date(System.currentTimeMillis() + accessExpInMillis)) // 10초
                 .signWith(Keys.hmacShaKeyFor(environment.getProperty("secretKey").getBytes()))
                 .compact();
 
@@ -83,11 +82,12 @@ public class JwtService {
     }
 
     private String generateRefreshToken(String subject, Map<String, Object> claims) {
+        long refreshExpInMillis = Long.parseLong(Objects.requireNonNull(environment.getProperty("refreshExp")));
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 100000))
+                .setExpiration(new Date(System.currentTimeMillis() + refreshExpInMillis))
                 .signWith(Keys.hmacShaKeyFor(environment.getProperty("secretKey").getBytes()))
                 .compact();
     }
@@ -97,17 +97,6 @@ public class JwtService {
         redisTemplate.opsForValue().set(key, refreshToken);
     }
 
-
-/*    public Boolean validateRefreshToken(String username) {
-        String storedRefreshToken = getStoredRefreshToken(username);
-
-        if (storedRefreshToken == null) {
-            return false;
-        }
-
-        Date expirationDate = extractExpiration(storedRefreshToken);
-        return !expirationDate.before(new Date());
-    }*/
 
     public boolean isRefreshTokenExpired(String username) {
         String storedRefreshToken = getStoredRefreshToken(username);
@@ -129,7 +118,7 @@ public class JwtService {
 
 
     public String refreshTokens(Long memberId, String accessToken, HttpServletResponse response) {
-        // 1. access 토큰 검증
+
         Optional<Auth> auth = authRepository.findById(memberId);
         String username = auth.get().getEmail();
 
@@ -137,15 +126,8 @@ public class JwtService {
             return "refreshTokenExpired";
         }
 
-      /*  if (!validateRefreshToken(username)) {
-            // refreshToken이 만료되었으면 클라이언트에게 다시 로그인을 요청하도록 처리
-            throw new RuntimeException("RefreshToken expired");
-        }*/
-
-        // 2. refresh 토큰 claims 추출
         Claims refreshTokenClaims = extractClaimsFromRefreshToken(username);
 
-        // 3. access 토큰 재발급
         Map<String, Object> accessTokenClaims = new HashMap<>();
         accessTokenClaims.put("role", refreshTokenClaims.get("role"));
         accessTokenClaims.put("memberId", refreshTokenClaims.get("memberId"));
@@ -153,19 +135,15 @@ public class JwtService {
 
         String newAccessToken = generateToken(username, accessTokenClaims, response);
 
-        // 4. refresh 토큰 재발급
-        //String newRefreshToken = generateRefreshToken(username, accessTokenClaims);
         String newRefreshToken = refreshTokenClaims.getExpiration().before(new Date())
                 ? null
                 : generateRefreshToken(username, accessTokenClaims);
 
-        // 5. Redis에 새로운 refresh 토큰 저장
         storeRefreshToken(username, newRefreshToken);
 
         return newAccessToken;
     }
 
-    // 리프레시 claim 가져오기
     private Claims extractClaimsFromRefreshToken(String username) {
         String refreshToken = getStoredRefreshToken(username);
         Claims refreshTokenClaims = Jwts.parser().setSigningKey(Keys.hmacShaKeyFor(key.getBytes())).parseClaimsJws(refreshToken).getBody();
