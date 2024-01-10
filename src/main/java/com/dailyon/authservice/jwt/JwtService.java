@@ -72,7 +72,7 @@ public class JwtService {
                 .setClaims(claims)
                 .setSubject(subject)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + accessExpInMillis)) // 10초
+                .setExpiration(new Date(System.currentTimeMillis() + accessExpInMillis))
                 .signWith(Keys.hmacShaKeyFor(environment.getProperty("secretKey").getBytes()))
                 .compact();
 

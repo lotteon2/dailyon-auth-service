@@ -88,7 +88,6 @@ public class AuthService extends DefaultOAuth2UserService {
             authRepository.save(auth);
             jwtToken = authenticateAndGenerateToken(email, response);
         }
-        log.info("User login successful. JWT Token: " + jwtToken);
         return jwtToken;
     }
 
@@ -107,7 +106,6 @@ public class AuthService extends DefaultOAuth2UserService {
 
 
         if ("google".equals(provider)) {
-            log.info("구글 로그인");
             String nickname= oAuth2User.getAttribute("name");
             String email = oAuth2User.getAttribute("email");
             String profileImgUrl = oAuth2User.getAttribute("picture");
@@ -138,14 +136,6 @@ public class AuthService extends DefaultOAuth2UserService {
                 saveAuth(email, "ROLE_USER", memberCreateRequest, response);
             }
         }
-
-        log.info("############");
-        log.info(String.valueOf(oAuth2User));
-        log.info(userNameAttributeName);
-        log.info("##############");
-
-
-
 
         return new DefaultOAuth2User(authorities, oAuth2User.getAttributes(), userNameAttributeName);
     }
